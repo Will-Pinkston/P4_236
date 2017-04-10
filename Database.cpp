@@ -363,23 +363,6 @@ relation database::relJoin (relation &rLeft, relation &rRight/*,
     std::set<tuple, relation::tuple_compare>::iterator leftCounter = leftTuples.begin();
     
     relJoinHelper(rLeft, rRight, leftFound, rightFound, rightTuples, leftCounter, retVal);
-    for (int i = 0; i < rLeft.getSize(); i++)
-    {
-        std::set<tuple, relation::tuple_compare>::iterator rightCounter = rightTuples.begin();
-        for (int j = 0; j < rRight.getSize(); j++)
-        {
-            bool parallel = relJoinCheckParallel(leftFound, rightFound, leftCounter, rightCounter);
-            if (parallel)
-            {
-                std::vector<std::string> jointAttributes;
-                addAttributes(jointAttributes, leftCounter);
-                addNonParallel(jointAttributes, rightCounter, rightFound);
-                retVal.addTuple(jointAttributes);
-            }
-            rightCounter++;
-        }
-        leftCounter++;
-    }
     
     return retVal;
 }
