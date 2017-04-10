@@ -30,8 +30,10 @@ public:
     //part 4
     bool relUnion (relation* rLeft, relation &rRight);
     relation relJoin (relation &rLeft, relation &rRight);
+    bool relJoinHelper(relation &rLeft, relation &rRight, std::vector<int> &leftFound, std::vector<int> &rightFound, std::set<tuple, relation::tuple_compare> &rightTuples, std::set<tuple, relation::tuple_compare>::iterator leftCounter, relation &retVal);
     bool relJoinCheckParallel(std::vector<int> leftFound, std::vector<int> rightFound, std::set<tuple, relation::tuple_compare>::iterator leftCounter, std::set<tuple, relation::tuple_compare>::iterator rightCounter);
     bool addNonParallel(std::vector<std::string> &jointAttributes,std::set<tuple, relation::tuple_compare>::iterator rightCounter, std::vector<int> &rightFound);
+    
     
     relation crossProduct (relation &rLeft, relation &rRight);
     bool addAttributes(std::vector<std::string> &hold, std::set<tuple, relation::tuple_compare>::iterator counter);
