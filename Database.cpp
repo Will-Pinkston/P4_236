@@ -510,19 +510,7 @@ bool database::evalRule(rule check)
     relation projected(check.getHead().getId(), predicateRelations[0].getMapOriginal());
     projected.copyTuples(predicateRelations[0].project(headMap));
     
-    //incomplete
-    for (int i = 0; i < headMap.size(); i++)
-    {
-        for (int j = 0; j < headMap.size(); j++)
-        {
-            if (projected.getMapOriginal()[j] == headMap[i])
-            {
-                projected.fullRename(j, _relations[findRelation(projected.getName())]->getMapOriginal()[i]);
-            }
-        }
-    }
-    
-    
+    evalRuleHelper(headMap, projected);
     
     //Union the new tuples into the original relation
     int beforeSize = (int)_relations[findRelation(projected.getName())]->getSize();
@@ -533,6 +521,20 @@ bool database::evalRule(rule check)
     return true;
 }
 
+bool database::evalRuleHelper(std::vector<std::string> &headMap, relation &projected)
+{
+    for (int i = 0; i < headMap.size(); i++)
+    {
+        for (int j = 0; j < headMap.size(); j++)
+        {
+            if (projected.getMapOriginal()[j] == headMap[i])
+            {
+                projected.fullRename(j, _relations[findRelation(projected.getName())]->getMapOriginal()[i]);
+            }
+        }
+    }
+    return true;
+}
 
 int database::findRelation(std::string relName)
 {

@@ -44,6 +44,7 @@ public:
     bool removeAttributes(std::vector<std::string> &hold, int numAttributes);
     std::string fillRules();
     bool evalRule(rule check);
+    bool evalRuleHelper(std::vector<std::string> &headMap, relation &projected);
     int findRelation(std::string relName);
     std::vector<std::string> findJoin(relation rLeft, relation rRight);
 private:
