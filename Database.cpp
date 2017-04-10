@@ -375,9 +375,9 @@ bool database::checkFailConditions(std::vector<std::string> &leftCriteria, std::
 {
     if (leftCriteria.size() != rightCriteria.size()) return false;
     
-    if (leftCriteria.size() == 0 || rightCriteria.size() == 0) return false;
+//    if (leftCriteria.size() == 0 || rightCriteria.size() == 0) return false;
     
-    if (rLeft.getSize() == 0 || rRight.getSize() == 0) return false;
+//    if (rLeft.getSize() == 0 || rRight.getSize() == 0) return false;
     
     if (rightFound.size() == 0 || leftFoundTest == false) return false;
     return true;
