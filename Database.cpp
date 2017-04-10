@@ -316,6 +316,7 @@ relation database::relJoin (relation &rLeft, relation &rRight/*,
         }
     }
     
+    
     bool leftFoundTest = false;
     for (int i = 0; i < leftCriteria.size(); i++)
     {
@@ -367,31 +368,12 @@ relation database::relJoin (relation &rLeft, relation &rRight/*,
         std::set<tuple, relation::tuple_compare>::iterator rightCounter = rightTuples.begin();
         for (int j = 0; j < rRight.getSize(); j++)
         {
-            bool parallel = true;
-            for (int k = 0; k < leftFound.size(); k++)
-            {
-                if (leftCounter->getAttribute(leftFound[k]) != rightCounter->getAttribute(rightFound[k]))
-                {
-                    parallel = false;
-                }
-            }
+            bool parallel = relJoinCheckParallel(leftFound, rightFound, leftCounter, rightCounter);
             if (parallel)
             {
                 std::vector<std::string> jointAttributes;
-                for (int l = 0; l < leftCounter->getNumAttributes(); l++)
-                {
-                    jointAttributes.push_back(leftCounter->getAttribute(l));
-                }
-                
-                for (int l = 0; l < rightCounter->getNumAttributes(); l++)
-                {
-                    bool skip = false;
-                    for (int m = 0; m < rightFound.size(); m++)
-                    {
-                        if (l == rightFound[m]) skip = true;
-                    }
-                    if (!skip) jointAttributes.push_back(rightCounter->getAttribute(l));
-                }
+                addAttributes(jointAttributes, leftCounter);
+                addNonParallel(jointAttributes, rightCounter, rightFound);
                 retVal.addTuple(jointAttributes);
             }
             rightCounter++;
@@ -400,6 +382,32 @@ relation database::relJoin (relation &rLeft, relation &rRight/*,
     }
     
     return retVal;
+}
+
+bool database::addNonParallel(std::vector<std::string> &jointAttributes,std::set<tuple, relation::tuple_compare>::iterator rightCounter, std::vector<int> &rightFound)
+{
+    for (int l = 0; l < rightCounter->getNumAttributes(); l++)
+    {
+        bool skip = false;
+        for (int m = 0; m < rightFound.size(); m++)
+        {
+            if (l == rightFound[m]) skip = true;
+        }
+        if (!skip) jointAttributes.push_back(rightCounter->getAttribute(l));
+    }
+    return true;
+}
+
+bool database::relJoinCheckParallel(std::vector<int> leftFound, std::vector<int> rightFound, std::set<tuple, relation::tuple_compare>::iterator leftCounter, std::set<tuple, relation::tuple_compare>::iterator rightCounter)
+{
+    for (int k = 0; k < leftFound.size(); k++)
+    {
+        if (leftCounter->getAttribute(leftFound[k]) != rightCounter->getAttribute(rightFound[k]))
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 std::string database::fillRules()
