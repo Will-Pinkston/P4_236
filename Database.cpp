@@ -305,29 +305,9 @@ relation database::relJoin (relation &rLeft, relation &rRight/*,
     
     std::vector<std::string> rMap = rRight.getMapOriginal();
     std::vector<int> rightFound;
-    for (int i = 0; i < rightCriteria.size(); i++)
-    {
-        for (int j = 0; j < rMap.size(); j++)
-        {
-            if (rMap[j] == rightCriteria[i])
-            {
-                rightFound.push_back(j);
-            }
-        }
-    }
+    rightCriteriaFinder(rightCriteria, rightFound, rMap);
     
-    
-    bool leftFoundTest = false;
-    for (int i = 0; i < leftCriteria.size(); i++)
-    {
-        for (int j = 0; j < rLeft.getMapOriginal().size(); j++)
-        {
-            if (rLeft.getMapOriginal()[j] == leftCriteria[i])
-            {
-                leftFoundTest = true;
-            }
-        }
-    }
+    bool leftFoundTest = leftCriteriaFinder(leftCriteria, rLeft);
     
     for (int i = (int)rightFound.size() - 1; i >= 0; i--)
     {
@@ -342,13 +322,7 @@ relation database::relJoin (relation &rLeft, relation &rRight/*,
     
     relation retVal(rLeft.getName() + "_" + rRight.getName() + "_Join", joinMap);
     
-    if (leftCriteria.size() != rightCriteria.size()) return retVal;
-    
-    if (leftCriteria.size() == 0 || rightCriteria.size() == 0) return retVal;
-    
-    if (rLeft.getSize() == 0 || rRight.getSize() == 0) return retVal;
-    
-    if (rightFound.size() == 0 || leftFoundTest == false) return retVal;
+    if (checkFailConditions(leftCriteria, rightCriteria, rLeft, rRight, rightFound, leftFoundTest)) return retVal;
     
     std::vector<int> leftFound;
     
@@ -365,6 +339,48 @@ relation database::relJoin (relation &rLeft, relation &rRight/*,
     relJoinHelper(rLeft, rRight, leftFound, rightFound, rightTuples, leftCounter, retVal);
     
     return retVal;
+}
+
+bool database::rightCriteriaFinder(std::vector<std::string> &rightCriteria, std::vector<int> &rightFound, std::vector<std::string> &rMap)
+{
+    for (int i = 0; i < rightCriteria.size(); i++)
+    {
+        for (int j = 0; j < rMap.size(); j++)
+        {
+            if (rMap[j] == rightCriteria[i])
+            {
+                rightFound.push_back(j);
+            }
+        }
+    }
+    return true;
+}
+
+bool database::leftCriteriaFinder(std::vector<std::string> &leftCriteria,relation &rLeft)
+{
+    for (int i = 0; i < leftCriteria.size(); i++)
+    {
+        for (int j = 0; j < rLeft.getMapOriginal().size(); j++)
+        {
+            if (rLeft.getMapOriginal()[j] == leftCriteria[i])
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool database::checkFailConditions(std::vector<std::string> &leftCriteria, std::vector<std::string> &rightCriteria, relation &rLeft, relation &rRight, std::vector<int> &rightFound, bool &leftFoundTest)
+{
+    if (leftCriteria.size() != rightCriteria.size()) return false;
+    
+    if (leftCriteria.size() == 0 || rightCriteria.size() == 0) return false;
+    
+    if (rLeft.getSize() == 0 || rRight.getSize() == 0) return false;
+    
+    if (rightFound.size() == 0 || leftFoundTest == false) return false;
+    return true;
 }
 
 bool database::relJoinHelper(relation &rLeft, relation &rRight, std::vector<int> &leftFound, std::vector<int> &rightFound, std::set<tuple, relation::tuple_compare> &rightTuples, std::set<tuple, relation::tuple_compare>::iterator leftCounter, relation &retVal)
